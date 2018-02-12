@@ -1,5 +1,8 @@
 package gltf;
 
+import haxe.io.Bytes;
+import haxe.crypto.Base64;
+
 import tink.Json;
 import tink.json.Representation;
 
@@ -50,7 +53,7 @@ typedef Node = {
 
 typedef Buffer = {
     var byteLength : Int;
-    var uri : String;
+    var uri : DataURI;
 }
 
 typedef BufferViewRaw = {
@@ -118,6 +121,21 @@ abstract ComponentType(Int) {
 enum Stride {
     Fixed(v : Int);
     Tight;
+}
+
+abstract DataURI(Bytes) to Bytes {
+    inline function new(v) this = v;
+
+    @:to function toRepresentation():Representation<String> {
+        return new Representation('data:application/octet-stream;base64,${Base64.encode(this)}');
+    }
+
+    @:from static function ofRepresentation(rep:Representation<String>) {
+        if (DATA_URI_PATTERN.match(rep.get()))
+            return new DataURI(Base64.decode(DATA_URI_PATTERN.matched(1)));
+        else
+            throw 'Only base64-encoded data-uris are currently supported (failed to read ${rep.get()}';
+    }
 }
 
 abstract AccessorReference(Int) to Int {
@@ -280,10 +298,12 @@ abstract Matrix4(Array<Float>) {
 
 class GLTFLoader { 
     public static inline var VERSION = 2.0;
+    public static var DATA_URI_PATTERN(default, never) = ~/data:.*?;base64,(.*)/;
 
     public static function load(path : String, verify = false) {
         var data = sys.io.File.getContent(path);
         var glTF:GLTF = Json.parse(data);
-        trace(glTF.meshes[0].primitives[0].attributes.position.get(glTF));
+
+        trace(glTF.meshes[0].primitives[0].attributes.position.get(glTF).bufferView.get(glTF).buffer.get(glTF).data);
     }
 }
