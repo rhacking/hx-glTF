@@ -1,0 +1,7 @@
+-cp src
+-D analyzer-optimize
+-main Main
+
+-lib tink_json
+
+--interp
