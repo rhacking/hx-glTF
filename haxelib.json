@@ -1,6 +1,6 @@
 {
     "name": "hx-glTF", 
-    "url" : "https://github.com/jasononeil/useless/",
+    "url" : "https://github.com/rhacking/useless/",
     "license": "MIT",
     "tags": ["glTF"],
     "description": "Compactish glTF loader for Haxe",
@@ -9,6 +9,6 @@
     "releasenote": "Initial release",
     "contributors": ["Roel"],
     "dependencies": {
-        "tink_": "tink_json"
+        "tink_json": ""
     }
 }

@@ -131,8 +131,8 @@ abstract DataURI(Bytes) to Bytes {
     }
 
     @:from static function ofRepresentation(rep:Representation<String>) {
-        if (DATA_URI_PATTERN.match(rep.get()))
-            return new DataURI(Base64.decode(DATA_URI_PATTERN.matched(1)));
+        if (GLTFLoader.DATA_URI_PATTERN.match(rep.get()))
+            return new DataURI(Base64.decode(GLTFLoader.DATA_URI_PATTERN.matched(1)));
         else
             throw 'Only base64-encoded data-uris are currently supported (failed to read ${rep.get()}';
     }
@@ -300,10 +300,15 @@ class GLTFLoader {
     public static inline var VERSION = 2.0;
     public static var DATA_URI_PATTERN(default, never) = ~/data:.*?;base64,(.*)/;
 
-    public static function load(path : String, verify = false) {
+    #if sys
+    public static function loadFile(path : String) {
         var data = sys.io.File.getContent(path);
-        var glTF:GLTF = Json.parse(data);
+        return load(data);
+    }
+    #end
 
-        trace(glTF.meshes[0].primitives[0].attributes.position.get(glTF).bufferView.get(glTF).buffer.get(glTF).data);
+    public static function load(data : String) {
+        var glTF:GLTF = Json.parse(data);
+        return glTF;
     }
 }
